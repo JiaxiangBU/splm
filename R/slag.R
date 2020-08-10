@@ -3,7 +3,7 @@
 slag <- function(x, listw, maxlag=1, ...) {
     UseMethod("slag")
 }
-
+# browser()
 slag.default <- function(x, listw, maxlag=1, index, ...){
     ## needs a vector and a well-specified index
     if(length(x)!=length(index)) {

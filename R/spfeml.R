@@ -1,4 +1,4 @@
-spfeml<-function(formula, data=list(), index=NULL, listw, listw2 = NULL, na.action, 
+spfeml<-function(formula, data=list(), index=NULL, listw, listw2 = NULL, na.action,
 model = c("lag","error", "sarar"), effects = c('spfe','tpfe','sptpfe','pooling'), method= "eigen", quiet = TRUE, zero.policy = NULL, interval1 = NULL, interval2 = NULL, trs1 = NULL, trs2 = NULL, tol.solve = 1e-10, control = list(), legacy = FALSE, llprof = NULL, cl = NULL, Hess = FALSE, LeeYu = FALSE, ...){
 
         # timings <- list()
@@ -10,13 +10,13 @@ effects <- match.arg(effects)
 if (model == "sarar") con <- list(LAPACK = FALSE,  Imult = 2L, cheb_q = 5L, MC_p = 16L, MC_m=30L, super=FALSE, opt_method = "nlminb", opt_control = list(), pars = NULL, npars = 4L, pre_eig1 = NULL, pre_eig2 = NULL)
 
 else     con <- list(tol.opt = .Machine$double.eps^0.5,  Imult = 2, cheb_q = 5, MC_p = 16, MC_m = 30, super = NULL, spamPivot = "MMD", in_coef = 0.1, type = "MC", correct = TRUE, trunc = TRUE, SE_method = "LU", nrho = 200, interpn = 2000, SElndet = NULL, LU_order = FALSE, pre_eig = NULL)
-	
+
 
 
 nmsC <- names(con)
 con[(namc <- names(control))] <- control
-    
-    if (length(noNms <- namc[!namc %in% nmsC])) 
+
+    if (length(noNms <- namc[!namc %in% nmsC]))
             warning("unknown names in control: ", paste(noNms, collapse = ", "))
 
 ##    if (is.null(quiet)) # now this has a default in spml(), hence it never is
@@ -26,8 +26,8 @@ con[(namc <- names(control))] <- control
 	if (is.null(zero.policy))
             zero.policy <- get.ZeroPolicyOption()
         stopifnot(is.logical(zero.policy))
-	  
-	  
+
+
 	  ## reorder data if needed
   #if(!is.null(index)) {
     #require(plm)
@@ -74,7 +74,7 @@ con[(namc <- names(control))] <- control
   #  ind <- attr(pmod$model, "index")[, 1]
   #  tind <- attr(pmod$model, "index")[, 2]
   ## Gio 8/1/16
-
+  # browser()
   x<-model.matrix(formula,data=data)
   clnames <- colnames(x)
   rwnames <- rownames(x)
@@ -102,8 +102,8 @@ con[(namc <- names(control))] <- control
   }
 	x <- as.matrix(x)
     k <- dim(x)[2]
-      
-    
+
+
 
   ## det. number of groups and df
   N<-length(unique(ind))
@@ -129,23 +129,23 @@ con[(namc <- names(control))] <- control
    }
   if (!inherits(listw, "listw"))
         stop("No neighbourhood list")
-     
+
  		can.sim <- FALSE
-    if (listw$style %in% c("W", "S")) 
+    if (listw$style %in% c("W", "S"))
         can.sim <- can.be.simmed(listw)
     if (!is.null(na.act)) {
         subset <- !(1:length(listw$neighbours) %in% na.act)
         listw <- subset(listw, subset, zero.policy = zero.policy)
 }
-     
-###specific checks for the SARAR        
+
+###specific checks for the SARAR
 if(model == "sarar"){
-	
-	 if (is.null(listw2)) 
+
+	 if (is.null(listw2))
         listw2 <- listw
-     if (!is.null(con$pre_eig1) && is.null(con$pre_eig2)) 
+     if (!is.null(con$pre_eig1) && is.null(con$pre_eig2))
         con$pre_eig2 <- con$pre_eig1
-    else if (!inherits(listw2, "listw")) 
+    else if (!inherits(listw2, "listw"))
         stop("No 2nd neighbourhood list")
 
 # if (is.null(con$fdHess)) con$fdHess <- method != "eigen"
@@ -160,7 +160,7 @@ if(model == "sarar"){
     stopifnot(is.logical(con$super))
 
     can.sim2 <- FALSE
-    if (listw2$style %in% c("W", "S")) 
+    if (listw2$style %in% c("W", "S"))
         can.sim2 <- can.be.simmed(listw2)
     if (!is.null(na.act)) {
         subset <- !(1:length(listw2$neighbours) %in% na.act)
@@ -186,8 +186,8 @@ switch(model, lag = if (!quiet) cat("\n Spatial Lag Fixed Effects Model \n"),
 	indic1<-seq(1,N)
 	inde1<-rep(indic1,time) ####takes observations 1,  n+1, 2n+1...
   ### generates Wy if model=='lag'
-  
-  
+
+
 env <- new.env(parent=globalenv())
 assign("y",y, envir=env)
 assign("x",x, envir=env)
@@ -199,7 +199,7 @@ assign("n",n, envir=env)
 
 
 wy <- unlist(tapply(y,inde, function(u) lag.listw(listw,u, zero.policy = zero.policy), simplify=TRUE))
-	
+
 
 #demeaning of the y and x variables depending both on model and effects
 
@@ -215,7 +215,7 @@ if (model %in% c("lag", "sarar")) {
 		wytms<-tapply(wy,inde,mean) ###same thing for Wy
 		wytm<-rep(wytms,each=N)
 assign("wytms",wytms, envir=env)
-				
+
 }
 
 assign("ytms",ytms, envir=env)
@@ -236,12 +236,12 @@ if (model %in% c("lag", "sarar")){
 			wysm<-rep(wysms,time)
 			assign("wysms",wysms, envir=env)
 			}
-			
+
 assign("ysms",ysms, envir=env)
-assign("xsms",xsms, envir=env)		
+assign("xsms",xsms, envir=env)
 	}
-	
-	
+
+
 # if (effects=='pooled'){
 	# yt<-y  	###keep the variables with no transformation
 	# xt<-x
@@ -269,17 +269,17 @@ if (effects=="sptpfe"){ ####generate the demeaned variables for both types of FE
 # if(effects == 'pooling')	{
 	# yt <- y
 	# xt <- x
-# }							
+# }
 
 	wyt<-unlist(tapply(yt,inde, function(u) lag.listw(listw,u), simplify=TRUE))
 
 if(model=="sarar")	{
 	w2yt<-unlist(tapply(yt,inde, function(u) lag.listw(listw2,u), simplify=TRUE))
 	w2wyt<-unlist(tapply(wyt,inde, function(u) lag.listw(listw2,u), simplify=TRUE))
-	
+
 	}
-								
-								
+
+
 if 	(model == "error"){
 	dm<-function(A) trash<-unlist(tapply(A,inde,function(TT) lag.listw(listw,TT), simplify=TRUE))
    wxt<-apply(xt,2,dm)
@@ -299,7 +299,7 @@ if 	(model == "sarar"){
 # print(clnames)
 colnames(xt)<- clnames
 
-	
+
 
 assign("yt",yt, envir=env)
 assign("xt",xt, envir=env)
@@ -317,11 +317,11 @@ if (model == "sarar")	{
 	assign("can.sim2", can.sim2, envir=env)
 	assign("similar2", FALSE, envir = env)
 	}
-	} 
+	}
 
 if(model %in% c("lag", "error") ){
-	
-	assign("compiled_sse", con$compiled_sse, envir=env)	
+
+	assign("compiled_sse", con$compiled_sse, envir=env)
 	assign("f_calls", 0L, envir = env)
     assign("hf_calls", 0L, envir = env)
 
@@ -340,7 +340,7 @@ assign("con", con, envir=env)
 
 
 
-    if (!quiet) 
+    if (!quiet)
         cat(paste("\nSpatial fixed effects model\n", "Jacobian calculated using "))
 
 if(model == "lag"){
@@ -349,13 +349,13 @@ if(model == "lag"){
 
 
     RES<- splaglm(env = env, zero.policy = zero.policy, interval = interval1, con = con, llprof = llprof, tol.solve= tol.solve, Hess = Hess, method = method, LeeYu = LeeYu, effects = effects)
-    
-    res.eff<-felag(env = env, beta = RES$coeff, sige = RES$s2, effects = effects, method = method, lambda = RES$lambda, legacy = legacy, zero.policy = zero.policy)    
+
+    res.eff<-felag(env = env, beta = RES$coeff, sige = RES$s2, effects = effects, method = method, lambda = RES$lambda, legacy = legacy, zero.policy = zero.policy)
 
 	}
 
 if(model == "sarar"){
-	
+
     interval1 <- jacobianSetup(method, env, con, pre_eig = con$pre_eig1, trs = trs1, interval = interval1, which = 1)
     assign("interval1", interval1, envir = env)
     interval2 <- jacobianSetup(method, env, con, pre_eig = con$pre_eig2, trs = trs2, interval = interval2, which = 2)
@@ -363,11 +363,11 @@ if(model == "sarar"){
     # nm <- paste(method, "set_up", sep = "_")
     # timings[[nm]] <- proc.time() - .ptime_start
     # .ptime_start <- proc.time()
-    
+
       RES<- spsararlm(env = env, zero.policy = zero.policy, con = con, llprof = llprof, tol.solve = tol.solve, Hess = Hess, LeeYu = LeeYu, effects = effects)
-  
-  
-res.eff<-felag(env = env, beta=RES$coeff, sige=RES$s2, effects = effects ,method = method, lambda = RES$lambda, legacy = legacy, zero.policy = zero.policy)    	
+
+
+res.eff<-felag(env = env, beta=RES$coeff, sige=RES$s2, effects = effects ,method = method, lambda = RES$lambda, legacy = legacy, zero.policy = zero.policy)
 
 
 		}
@@ -379,15 +379,15 @@ if (model=='error'){
     assign("interval1", interval1, envir = env)
     # nm <- paste(method, "set_up", sep = "_")
     # timings[[nm]] <- proc.time() - .ptime_start
-    # .ptime_start <- proc.time()	
+    # .ptime_start <- proc.time()
 
-  RES <- sperrorlm(env = env, zero.policy = zero.policy, interval = interval1, Hess = Hess, LeeYu = LeeYu, effects = effects)	
+  RES <- sperrorlm(env = env, zero.policy = zero.policy, interval = interval1, Hess = Hess, LeeYu = LeeYu, effects = effects)
     	res.eff<-feerror(env = env, beta=RES$coeff, sige=RES$s2, effects = effects ,method =method, rho=RES$rho, legacy = legacy)
-    	
+
     }
-    
-	
-	
+
+
+
 
     ##calculate the R-squared
     yme <- y-mean(y)
@@ -403,8 +403,8 @@ if (model=='error'){
 
 
 	nam.rows <- dimnames(x)[[1]]
-	
-	
+
+
    names(y.hat) <- nam.rows
    names(res) <- nam.rows
 
@@ -433,21 +433,21 @@ if (Hess){
 		var[1,1]<-	RES$lambda.se
 		var[(2:ncol(var)),(2:ncol(var))]<-RES$asyvar1
 	}
-	
+
 	if(model == "error" ){
 	 	var<-matrix(0,(ncol(RES$asyvar1)+1),(ncol(RES$asyvar1)+1))
     	var[1,1]<-	RES$rho.se
     	var[(2:ncol(var)),(2:ncol(var))]<-RES$asyvar1
 	}
-	
+
 	if(model == "sarar"){
 		var <- matrix(0,(ncol(RES$asyvar1)+2),(ncol(RES$asyvar1)+2))
 	    var[1,1] <-	RES$lambda.se
 	    var[2,2] <-	RES$rho.se
 	    var[(3:ncol(var)),(3:ncol(var))] <- RES$asyvar1
 	}
-	
-} 
+
+}
 
 else{
 
@@ -462,7 +462,7 @@ if(model == "error" ){
    var[1,1]<-	RES$rho.se
    var[(2:ncol(var)),(2:ncol(var))]<-RES$asyvar1
 	}
-	
+
 if(model == "sarar"){
    var<-matrix(0,(ncol(RES$asyvar1)+2),(ncol(RES$asyvar1)+2))
    var[1,1]<-	RES$lambda.se
@@ -479,17 +479,17 @@ spmod <- list(coefficients=Coeff, errcomp=NULL,
                 vcov.errcomp=NULL,
                 residuals=res, fitted.values=y.hat,
                 sigma2=RES$s2, type=type, model = model.data,
-                call=cl, logLik=RES$ll, method = method, effects=effects, 
+                call=cl, logLik=RES$ll, method = method, effects=effects,
                 res.eff=res.eff)
-                
-if (!is.null(na.act)) 
+
+if (!is.null(na.act))
         spmod$na.action <- na.act
-                
+
   class(spmod) <- "splm"
   return(spmod)
 
 	}
-       
-       
-       
-       
+
+
+
+

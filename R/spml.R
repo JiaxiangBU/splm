@@ -11,13 +11,13 @@ spml <- function(formula, data, index=NULL, listw, listw2=listw, na.action,
 
   ## check class(listw)
   checklw <- function(x) {
-    
+
     if(!("listw" %in% class(x))) {
         x <- x
       if("matrix" %in% class(x)) {
         #require(spdep)
         x <- mat2listw(x)
-      } 
+      }
       else {
         stop("'listw' has to be either a 'listw' or a 'matrix' object")
       }}
@@ -42,7 +42,7 @@ spml <- function(formula, data, index=NULL, listw, listw2=listw, na.action,
   #}
   #else{
   switch(match.arg(model), within={
-  
+
     if(lag) {
         model <- switch(match.arg(spatial.error),
                         b="sarar",
@@ -59,7 +59,7 @@ spml <- function(formula, data, index=NULL, listw, listw2=listw, na.action,
     }
     effects <- switch(match.arg(effect), individual="spfe",
                       time="tpfe", twoways="sptpfe")
-
+    # browser()
     res <- spfeml(formula=formula, data=data, index=index,
                   listw=listw, listw2=listw2, na.action,
                   model=model, effects=effects,
@@ -86,4 +86,4 @@ spml <- function(formula, data, index=NULL, listw, listw2=listw, na.action,
   return(res)
 }
 
-    
+
